@@ -127,7 +127,7 @@ let regex2nfa : Regex.t -> Nfa.t
 =fun regex -> 
 	let new_nfa = Nfa.create_new_nfa () in
 	let result = eval_regex regex new_nfa in
-	Nfa.print result; 
+	(* Nfa.print result;  *)
 		result
 
 let rec get_eps_closure
@@ -160,56 +160,56 @@ else
 
 let rec eval_nfa : Nfa.t -> Dfa.t -> Dfa.state -> Dfa.states->Dfa.states -> Dfa.t
 = fun nfa dfa state set_D set_W ->
-        print_endline ("state " ^ string_of_set state);
+        (* print_endline ("state " ^ string_of_set state); *)
         let nfa_final_state = Nfa.get_final_states nfa in
         let is_final = not (BatSet.is_empty (BatSet.intersect nfa_final_state state)) in
 
         let add_final_dfa = my_add_final_state is_final state dfa in
 
         let move_a = get_alpha_closure nfa A state (BatSet.empty) in
-        print_endline ("move_a " ^ string_of_set move_a);
+        (* print_endline ("move_a " ^ string_of_set move_a); *)
 
         let move_b = get_alpha_closure nfa B state (BatSet.empty) in
-        print_endline ("move_b " ^ string_of_set move_b);
+        (* print_endline ("move_b " ^ string_of_set move_b); *)
 
         let eps_closure_a = BatSet.fold (fun s set -> let n_set = get_eps_closure nfa s set in BatSet.union n_set set) move_a move_a in
-        print_endline ("eps_a " ^ string_of_set eps_closure_a);
+        (* print_endline ("eps_a " ^ string_of_set eps_closure_a); *)
         let eps_closure_b = BatSet.fold (fun s set -> let n_set = get_eps_closure nfa s set in BatSet.union n_set set) move_b move_b in
-        print_endline ("eps_b " ^ string_of_set eps_closure_b);
+        (* print_endline ("eps_b " ^ string_of_set eps_closure_b); *)
 
         let a_empty = BatSet.is_empty eps_closure_a in
         let b_empty = BatSet.is_empty eps_closure_b in
 
-          print_endline ("set_D " ^ string_of_states set_D);
-          print_endline ("set_W " ^ string_of_states set_W);
+          (* print_endline ("set_D " ^ string_of_states set_D); *)
+          (* print_endline ("set_W " ^ string_of_states set_W); *)
 
         if BatSet.is_empty state then (
           let add_edge = Dfa.add_edge (Dfa.add_edge add_final_dfa (state,A,state)) (state,B,state) in
-            print_endline("is_empty?");
+            (* print_endline("is_empty?"); *)
              (* Dfa.print add_edge;  *)
             let new_set_W = BatSet.remove state set_W in
             let new_set_W1 = my_add_eps_clousre (BatSet.mem eps_closure_a set_D) eps_closure_a new_set_W in
             let new_set_W2 = my_add_eps_clousre (BatSet.mem eps_closure_b set_D) eps_closure_b new_set_W1 in
             let new_set_D = BatSet.add eps_closure_b (BatSet.add eps_closure_a set_D) in
-              print_endline ("new_set_D " ^ string_of_states new_set_D);
-              print_endline ("new_set_W2 " ^ string_of_states new_set_W2);
-              print_endline (" ");
+              (* print_endline ("new_set_D " ^ string_of_states new_set_D); *)
+              (* print_endline ("new_set_W2 " ^ string_of_states new_set_W2); *)
+              (* print_endline (" "); *)
 
             if BatSet.is_empty new_set_W2 then
               add_edge
            else
               eval_nfa nfa add_edge (fst (BatSet.pop_min new_set_W2)) new_set_D new_set_W2
         )
-        else if BatSet.is_empty set_W then (print_endline ("empty set_W!"); add_final_dfa)
+        else if BatSet.is_empty set_W then ((* print_endline ("empty set_W!"); *) add_final_dfa)
         else
           let new_set_W = BatSet.remove state set_W in
           let new_set_W1 = my_add_eps_clousre (BatSet.mem eps_closure_a set_D) eps_closure_a new_set_W in
           let new_set_W2 = my_add_eps_clousre (BatSet.mem eps_closure_b set_D) eps_closure_b new_set_W1 in
           let new_set_D = BatSet.add eps_closure_b (BatSet.add eps_closure_a set_D) in
           
-          print_endline ("new_set_D " ^ string_of_states new_set_D);
-          print_endline ("new_set_W2 " ^ string_of_states new_set_W2);
-          print_endline (" ");
+          (* print_endline ("new_set_D " ^ string_of_states new_set_D); *)
+          (* print_endline ("new_set_W2 " ^ string_of_states new_set_W2); *)
+          (* print_endline (" "); *)
 
           match (a_empty, b_empty) with
           | (true, true) ->
@@ -218,7 +218,7 @@ let rec eval_nfa : Nfa.t -> Dfa.t -> Dfa.state -> Dfa.states->Dfa.states -> Dfa.
             let eval = eval_nfa nfa add2 eps_closure_a new_set_D new_set_W2 in
             let eval2 = eval_nfa nfa eval eps_closure_b new_set_D new_set_W2 in
               (* Dfa.print eval2; *)
-              print_endline ("t,t");
+              (* print_endline ("t,t"); *)
               eval2
           | (true, false) ->
             let add = Dfa.add_state add_final_dfa BatSet.empty in 
@@ -227,12 +227,12 @@ let rec eval_nfa : Nfa.t -> Dfa.t -> Dfa.state -> Dfa.states->Dfa.states -> Dfa.
             let edge2 = Dfa.add_edge edge1 (state, B, eps_closure_b) in
             if BatSet.mem eps_closure_a new_set_W2 then 
               let eval = eval_nfa nfa edge2 eps_closure_a new_set_D new_set_W2 in
-              print_endline ("false, false");
+              (* print_endline ("false, false"); *)
               (* Dfa.print eval; *)
               eval
             else
               let eval = eval_nfa nfa edge2 eps_closure_b new_set_D new_set_W2 in
-              print_endline ("false, false");
+              (* print_endline ("false, false"); *)
               (* Dfa.print eval; *)
               eval
           | (false, true) ->
@@ -243,14 +243,14 @@ let rec eval_nfa : Nfa.t -> Dfa.t -> Dfa.state -> Dfa.states->Dfa.states -> Dfa.
 
             if BatSet.mem eps_closure_a new_set_W2 then 
               let eval = eval_nfa nfa edge2 eps_closure_a new_set_D new_set_W2 in
-              print_endline ("false, false");
+              (* print_endline ("false, false"); *)
               (* Dfa.print eval; *)
               eval
            else if BatSet.mem eps_closure_b new_set_W2 then (
               (* print_string ("here?\n"); *)
               let eval = eval_nfa nfa edge2 eps_closure_b new_set_D new_set_W2 in
-              print_endline ("false, false");
-              Dfa.print eval;
+              (* print_endline ("false, false"); *)
+              (* Dfa.print eval; *)
               eval)
             else
               edge2 
@@ -265,14 +265,14 @@ let rec eval_nfa : Nfa.t -> Dfa.t -> Dfa.state -> Dfa.states->Dfa.states -> Dfa.
 
             if BatSet.mem eps_closure_a new_set_W2 then 
               let eval = eval_nfa nfa edge2 eps_closure_a new_set_D new_set_W2 in
-              print_endline ("false, false");
-              Dfa.print eval;
+              (* print_endline ("false, false"); *)
+              (* Dfa.print eval; *)
               eval
             else if BatSet.mem eps_closure_b new_set_W2 then (
-              print_string ("here?\n");
+              (* print_string ("here?\n"); *)
               let eval = eval_nfa nfa edge2 eps_closure_b new_set_D new_set_W2 in
-              print_endline ("false, false");
-              Dfa.print eval;
+              (* print_endline ("false, false"); *)
+              (* Dfa.print eval; *)
               eval)
             else
               edge2 
@@ -284,8 +284,8 @@ let nfa2dfa : Nfa.t -> Dfa.t
   let dfa_init_state = get_eps_closure nfa nfa_init_state (BatSet.singleton nfa_init_state) in
   let new_dfa = Dfa.create_new_dfa dfa_init_state in
   let result_dfa = eval_nfa nfa new_dfa dfa_init_state (BatSet.singleton dfa_init_state) (BatSet.singleton dfa_init_state) in
-    print_endline ("  ");
-    Dfa.print result_dfa;
+    (* print_endline ("  "); *)
+    (* Dfa.print result_dfa; *)
     result_dfa
 
 

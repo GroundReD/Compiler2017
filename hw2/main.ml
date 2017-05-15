@@ -15,8 +15,11 @@ let main () =
     else
     try
       let file_channel = open_in !src in
+        print_endline("file channer");
       let lexbuf = Lexing.from_channel file_channel in
+        print_endline("lexing");
       let s_pgm = Parser.program Lexer.start lexbuf in
+        print_endline("parser");
       let _ = print_endline "== source program ==";
               S.pp s_pgm in
       let _ = print_endline "== execute the source program ==";

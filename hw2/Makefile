@@ -13,10 +13,10 @@ s.cmo : s.ml
 		ocamlc -c s.ml
 
 parser.ml: parser.mly s.cmo
-		ocamlyacc parser.mly
+		ocamlyacc -v parser.mly
 
 parser.mli: parser.mly
-		ocamlyacc parser.mly
+		ocamlyacc -v parser.mly
 
 parser.cmi: parser.mli
 		ocamlc -c parser.mli

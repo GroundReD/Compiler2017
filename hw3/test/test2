@@ -4,4 +4,12 @@ if (x == y) {
   print (1)
 } else {
   print (2)
+};
+x = x+1;
+z = 2;
+
+if ((x==y) && !(x==z)) {
+	print (3);
+} else {
+	print (4);
 }

@@ -1,4 +1,7 @@
 x = 1;
 y = 2;
 z = x + y;
-print (z)
+print (z);
+x = 3;
+print (x+y+2);
+

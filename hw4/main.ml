@@ -33,7 +33,7 @@ let main () =
               T.pp t_pgm_opt in
       let _ = print_endline "== execute the optimized target program ==";
               (try T.execute t_pgm_opt
-               with (Failure s) -> print_endline ("Error: "^s)) in
+               with (Failure s) -> print_endline ("Error:1 "^s)) in
         ()
     with (Failure s) -> print_endline (!src ^ ": " ^ s)
 
